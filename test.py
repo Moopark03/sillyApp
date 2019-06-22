@@ -13,6 +13,27 @@ import testdata
 heroes = testdata.heroes
 classes = testdata.classes
 
+def buildSecondDeck(potList, subjects, deckIndex, maxAtt):
+    secondClass = {subjects: [heroes[subjects][1], heroes[subjects][0]]}
+
+    for att in secondClass[subjects]:
+        numCards = findInList(potList, att) #How many times the testing attribute appears in list
+
+        for possibleMax in classes[att]: #possibleMax = integers
+            if (10 - len(potList) < possibleMax - numCards):
+                break;
+            else:
+                maxAtt = possibleMax
+
+        for hero in heroes: #2nd inner loop: Grabbing the 2nd hero to test against
+            if(numCards >= maxAtt or len(potList) == 10 or maxAtt == 0):
+                break;
+            if(cardMatch(att, hero) and hero not in potList):
+                potList.append(hero)
+                deckIndex += 1
+                numCards += 1
+        maxAtt = 0
+
 def buildDeck(potList, subjects, deckIndex, maxAtt): #Doesn't go all the way down on the potList. WD list should be 10 cards with 2 savage
     for att in heroes[subjects]:
         numCards = findInList(potList, att) #How many times the testing attribute appears in list
@@ -23,9 +44,6 @@ def buildDeck(potList, subjects, deckIndex, maxAtt): #Doesn't go all the way dow
             else:
                 maxAtt = possibleMax
 
-        #maxAtt = max(classes[att]) #iterate through and find what the max number is for this class (attribute)
-        
-
         for hero in heroes: #2nd inner loop: Grabbing the 2nd hero to test against
             if(numCards >= maxAtt or len(potList) == 10 or maxAtt == 0):
                 break;
@@ -34,6 +52,8 @@ def buildDeck(potList, subjects, deckIndex, maxAtt): #Doesn't go all the way dow
                 deckIndex += 1
                 numCards += 1
         maxAtt = 0
+
+#what is this actually building up to so we can refactor this
             
 def displayDeck(potList):
 
@@ -56,10 +76,17 @@ def findInList(potList, att):
 def cardMatch(att, hero):
     for attName in heroes[hero]:
         if attName == att:
-            return True;
+            return True
     
-    return False;
+    return False
 
+def buildRest(potList, deckIndex, maxAtt):
+    if(len(potList) != 10):
+        for remaining in potList:
+            if(len(potList) != 10):
+                buildDeck(potList, remaining, deckIndex, maxAtt)
+            else:
+                break
 def main():
     deckIndex = 0
     maxAtt = 0
@@ -67,17 +94,23 @@ def main():
         potList = [subjects] #places original card into list
         deckIndex += 1
 
-        buildDeck(potList, subjects, deckIndex, maxAtt)
-        if(len(potList) != 10):
-            for remaining in potList:
-                if(len(potList) != 10):
-                    buildDeck(potList, remaining, deckIndex, maxAtt)
-                else:
-                    break
+        buildDeck(potList, subjects, deckIndex, maxAtt) #Builds deck maxing out att1 and att2 as much as possible
+        buildRest(potList, deckIndex, maxAtt) #if deck != 10 yet, this will fill out the remaing slots with other hero's att from list
+
         displayDeck(potList)
         potList.clear()
         deckIndex = 0
         maxAtt = 0
+        
+        potList = [subjects]
+        deckIndex += 1
+        buildSecondDeck(potList, subjects, deckIndex, maxAtt)
+        buildRest(potList, deckIndex, maxAtt)
+        displayDeck(potList)
+        potList.clear()
+        deckIndex = 0
+        maxAtt = 0
+
         
 
 if __name__ == '__main__':
