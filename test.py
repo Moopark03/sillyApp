@@ -1,20 +1,12 @@
 import testdata
 
-#creates a dictionary of heroes and adds the class names as values in a list
-#can access by heroes["key"][index]
-
-#print(len(heroes["axe"])) #prints how many classes it has
-#print(heroes["axe"][1]) #prints the second class of axe
-#for x in heroes:
-   # print(x) #returns a string
-    #print(len(x)) #returns character len of strings
-    #print(len(heroes[x])) #returns number of classes in the hero x
-#prints every hero name (key) in the dictionary
 heroes = testdata.heroes
 classes = testdata.classes
+maxAtt = 0
 
-def buildSecondDeck(potList, subjects, deckIndex, maxAtt):
+def buildSecondDeck(potList, subjects):
     secondClass = {subjects: [heroes[subjects][1], heroes[subjects][0]]}
+    global maxAtt
 
     for att in secondClass[subjects]:
         numCards = findInList(potList, att) #How many times the testing attribute appears in list
@@ -30,11 +22,11 @@ def buildSecondDeck(potList, subjects, deckIndex, maxAtt):
                 break;
             if(cardMatch(att, hero) and hero not in potList):
                 potList.append(hero)
-                deckIndex += 1
                 numCards += 1
         maxAtt = 0
 
-def buildDeck(potList, subjects, deckIndex, maxAtt): #Doesn't go all the way down on the potList. WD list should be 10 cards with 2 savage
+def buildDeck(potList, subjects): #Doesn't go all the way down on the potList. WD list should be 10 cards with 2 savage
+    global maxAtt
     for att in heroes[subjects]:
         numCards = findInList(potList, att) #How many times the testing attribute appears in list
 
@@ -49,11 +41,8 @@ def buildDeck(potList, subjects, deckIndex, maxAtt): #Doesn't go all the way dow
                 break;
             if(cardMatch(att, hero) and hero not in potList):
                 potList.append(hero)
-                deckIndex += 1
                 numCards += 1
         maxAtt = 0
-
-#what is this actually building up to so we can refactor this
             
 def displayDeck(potList):
 
@@ -62,7 +51,6 @@ def displayDeck(potList):
         counter = findInList(potList, attributes)
         if(counter > 0):
             print('{alliance}: {length}'.format(alliance=attributes, length=counter))
-
 
 def findInList(potList, att):
     count = 0
@@ -80,38 +68,34 @@ def cardMatch(att, hero):
     
     return False
 
-def buildRest(potList, deckIndex, maxAtt):
+def buildRest(potList):
     if(len(potList) != 10):
         for remaining in potList:
             if(len(potList) != 10):
-                buildDeck(potList, remaining, deckIndex, maxAtt)
+                buildDeck(potList, remaining)
             else:
                 break
-def main():
-    deckIndex = 0
+
+def deckCleanup(potList):
+    global maxAtt
+    displayDeck(potList)
+    potList.clear()
     maxAtt = 0
+
+def main():
+    #Start
     for subjects in heroes: #Outer for loop, subjects = string (hero name/key for dictionary heroes). Going through every hero in the game
         potList = [subjects] #places original card into list
-        deckIndex += 1
-
-        buildDeck(potList, subjects, deckIndex, maxAtt) #Builds deck maxing out att1 and att2 as much as possible
-        buildRest(potList, deckIndex, maxAtt) #if deck != 10 yet, this will fill out the remaing slots with other hero's att from list
-
-        displayDeck(potList)
-        potList.clear()
-        deckIndex = 0
-        maxAtt = 0
         
+        buildDeck(potList, subjects) #Builds deck maxing out att1 and att2 as much as possible
+        buildRest(potList) #if deck != 10 yet, this will fill out the remaing slots with other hero's att from list
+        deckCleanup(potList) #prints 
+
         potList = [subjects]
-        deckIndex += 1
-        buildSecondDeck(potList, subjects, deckIndex, maxAtt)
-        buildRest(potList, deckIndex, maxAtt)
-        displayDeck(potList)
-        potList.clear()
-        deckIndex = 0
-        maxAtt = 0
-
         
+        buildSecondDeck(potList, subjects) #Builds deck maxing out att2 then att1 as much as possible
+        buildRest(potList)
+        deckCleanup(potList)
 
 if __name__ == '__main__':
     main()
