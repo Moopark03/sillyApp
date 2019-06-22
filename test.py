@@ -3,6 +3,8 @@ import testdata
 heroes = testdata.heroes
 classes = testdata.classes
 maxAtt = 0
+searchList = [] #be able to create a list that points to a list based on the keyword. Maybe have to think about index
+#Is there a way to automate creating a dict
 
 def buildSecondDeck(potList, subjects):
     secondClass = {subjects: [heroes[subjects][1], heroes[subjects][0]]}
@@ -78,6 +80,8 @@ def buildRest(potList):
 
 def deckCleanup(potList):
     global maxAtt
+    global searchList
+    
     displayDeck(potList)
     potList.clear()
     maxAtt = 0
